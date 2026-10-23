@@ -2,8 +2,6 @@
 title: "Effect of winter icing and summer warming on leaf nutrient content of three dominant plant species in high-Arctic Svalbard"
 format: html
 editor: visual
-bibliography: references.bib
-csl: nordic-journal-of-botany.csl
 execute:
   echo: false
 ---
@@ -24,11 +22,12 @@ library(utils)     # To read tables
 #| label: load-data
 #| message: false
 
-df<-read.table(here("data/nutrients_plant_icing_adventdalen_2025.txt"), header = TRUE, sep = " ")
-
-# Filter out the required species
-salix <- traits |>
-  filter(Taxon == "bistorta vivipara")
+source("clean_data")
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+# Make a figure
+
+```{r}
+
+
+```
