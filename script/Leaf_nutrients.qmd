@@ -25,13 +25,15 @@ library(emmeans)   # emmeans for estimated values
 ```{r}
 #| label: load-data
 #| message: false
-
-source("clean_data.R")
+source(here("script/clean_data.R"))
 ```
 
 # Theme graphics
 
 ```{r}
+#| label: load-theme
+#| message: false
+#| 
 thm<-theme(text = element_text(colour = "black",size =12),
            axis.text.x = element_text(hjust = 0.5, colour = "black", size=12),
            axis.text.y = element_text(colour = "black",size =12),
@@ -49,7 +51,7 @@ col_treat=c("#3E3E3E", "#9BC3D9", "#53A48F", "#C58D5D")
 
 ## Leaf Nitrogen predicted values
 
-### Linear mixed-effects model
+### Model function
 
 ```{r}
 #| label: run a linear regression
@@ -62,6 +64,8 @@ fit_model <- function(data, response, pred1, pred2,
 }
 ```
 
+### Linear mixed-effects model
+
 ```{r}
 #| label: model
 lme_n <- fit_model(df, response = "n_corr", pred1 = "treatment", pred2 = "sp")
@@ -71,9 +75,8 @@ anova(lme_n)
 
 ### Model checking
 
-```{r fig.width=10, fig.height=10}
+```{r}
 #| label: model check
-check_model(lme_n)
 qqnorm(resid(lme_n))
 ```
 
@@ -118,7 +121,7 @@ p1 <- ggplot(means_data_n,
                col="black", 
                position = position_dodge(width = 0.75)) +
     scale_x_discrete(labels = c("Control", "Icing", "Icing/\nWarming", "Warming")) +
-    labs(x = "", y = "Leaf [N] content (%dwt)") +
+    labs(x = "", y = "Leaf [N] content (%dwt)", fill="Treatment") +
    thm+
    theme(legend.position = "bottom", 
          panel.grid = element_blank(),
@@ -126,9 +129,4 @@ p1 <- ggplot(means_data_n,
          strip.text = element_text(face = "italic", color = "black", size = 12), 
          axis.text.x = element_text(size = 8))
 ggplotly(p1)
-```
-
-```{r}
-#| label: Reproducable workflow
-renv::init()
 ```
