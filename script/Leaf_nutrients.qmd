@@ -13,7 +13,11 @@ execute:
 library(tidyverse) # for ggplot2, dplyr, readr etc
 library(here)      # for help finding files
 library(gt)        # for tables
-library(utils)     # To read tables
+library(utils)     # to read tables
+library(plotly)    # for interative plots
+library(lme4)      # for linear mixed-effects model
+library(performance) # to check models
+library(emmeans)   # emmeans for estimated values
 ```
 
 # Data loading
@@ -22,12 +26,104 @@ library(utils)     # To read tables
 #| label: load-data
 #| message: false
 
-source("clean_data")
+source("clean_data.R")
+```
+
+# Theme graphics
+
+```{r}
+thm<-theme(text = element_text(colour = "black",size =12),
+           axis.text.x = element_text(hjust = 0.5, colour = "black", size=12),
+           axis.text.y = element_text(colour = "black",size =12),
+           legend.text = element_text(size=10),
+           panel.grid = element_line(color="grey"),
+           panel.background = element_rect(color="black", fill="white"),
+           plot.caption = element_text(hjust=0),
+           axis.ticks.y = element_line(linewidth = 0.7, color = "black"),
+           axis.ticks.x = element_blank())
+
+col_treat=c("#3E3E3E", "#9BC3D9", "#53A48F", "#C58D5D")
+```
+
+# Models
+
+## Leaf Nitrogen predicted values
+
+### Linear mixed-effects model
+
+```{r}
+#| label: run a linear regression
+fit_model <- function(data, response, pred1, pred2,
+                      random = "(1|block/plot/subplot/leaf)",
+                      REML = FALSE) {
+  formula_txt <- paste0(response, " ~ ", pred1, " * ", pred2, " + ", random)
+  mod <- lmer(as.formula(formula_txt), data = data, REML = REML)
+  mod
+}
+```
+
+```{r}
+#| label: model
+lme_n <- fit_model(df, response = "n_corr", pred1 = "treatment", pred2 = "sp")
+summary(lme_n)
+anova(lme_n)
+```
+
+### Model checking
+
+```{r fig.width=10, fig.height=10}
+#| label: model check
+check_model(lme_n)
+qqnorm(resid(lme_n))
+```
+
+### Predicted values extraction from the model
+
+```{r}
+#| label: extract predicted values
+# Extract estimated values
+means_data_n <- as.data.frame(emmeans(lme_n, 
+                                      specs = c("treatment", "sp"),
+                                      regrid ="response"))
+
+# Extract predicted values into the dataframe
+df$predicted_n <- predict(lme_n, df)
 ```
 
 # Make a figure
 
+### Effect of the treatments on the leaf nitrogen content (%dwt)
+
 ```{r}
-
-
+#| label: figure 1. Leaf N content ~ treatment 
+(p1 <- ggplot(means_data_n, 
+              aes(x = treatment, fill=treatment)) +
+    geom_violin(data = df, aes(x = treatment, y = predicted_n), 
+                alpha = 0.5, 
+                linewidth = 0.8, 
+                position = position_dodge(width = 0.75)) +
+    facet_wrap(sp~., 
+               labeller = labeller(sp = c("A"="Alopecurus borealis", "B"="Bistorta vivipara","S"="Salix polaris")), 
+               scale="free_y")+ 
+        scale_fill_manual(values = col_treat, 
+                          labels = c("Control", "Icing", "Icing/Warming", "Warming"))+
+    geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), 
+                  col="black", 
+                  width = 0.15, 
+                  size = 0.65, 
+                  position = position_dodge(width = 0.75)) +
+    geom_point(aes(y = emmean), 
+               size = 3, 
+               shape = 18, 
+               col="black", 
+               position = position_dodge(width = 0.75)) +
+    scale_x_discrete(labels = c("Control", "Icing", "Icing/\nWarming", "Warming")) +
+    labs(x = "", y = "Leaf [N] content (%dwt)") +
+   thm+
+   theme(legend.position = "top", 
+         panel.grid = element_blank(),
+         strip.background = element_rect(fill = "white", color = "black"),
+         strip.text = element_text(face = "italic", color = "black", size = 12), 
+         axis.text.x = element_text(size = 8)))
+ggplotly(p1)
 ```
