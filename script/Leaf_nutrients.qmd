@@ -24,7 +24,11 @@ library(utils)     # To read tables
 #| label: load-data
 #| message: false
 
-df<-read.table(here("data/nutrients_plant_icing_adventdalen_2025.txt", header = TRUE, sep = " "))
+df<-read.table(here("data/nutrients_plant_icing_adventdalen_2025.txt"), header = TRUE, sep = " ")
+
+# Filter out the required species
+salix <- traits |>
+  filter(Taxon == "bistorta vivipara")
 ```
 
 The `echo: false` option disables the printing of code (only output is displayed).
