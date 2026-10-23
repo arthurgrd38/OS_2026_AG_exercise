@@ -96,7 +96,7 @@ df$predicted_n <- predict(lme_n, df)
 
 ```{r}
 #| label: figure 1. Leaf N content ~ treatment 
-(p1 <- ggplot(means_data_n, 
+p1 <- ggplot(means_data_n, 
               aes(x = treatment, fill=treatment)) +
     geom_violin(data = df, aes(x = treatment, y = predicted_n), 
                 alpha = 0.5, 
@@ -120,10 +120,15 @@ df$predicted_n <- predict(lme_n, df)
     scale_x_discrete(labels = c("Control", "Icing", "Icing/\nWarming", "Warming")) +
     labs(x = "", y = "Leaf [N] content (%dwt)") +
    thm+
-   theme(legend.position = "top", 
+   theme(legend.position = "bottom", 
          panel.grid = element_blank(),
          strip.background = element_rect(fill = "white", color = "black"),
          strip.text = element_text(face = "italic", color = "black", size = 12), 
-         axis.text.x = element_text(size = 8)))
+         axis.text.x = element_text(size = 8))
 ggplotly(p1)
+```
+
+```{r}
+#| label: Reproducable workflow
+renv::init()
 ```
