@@ -74,7 +74,7 @@ lme_n <- fit_model(df, response = "n_corr", pred1 = "treatment", pred2 = "sp")
 summary(lme_n)
 ```
 
-### Model checking
+### Model checking <!--# super stylish! I love these plots -->
 
 ```{r fig.width=10, fig.height=10}
 #| label: model check
@@ -134,3 +134,7 @@ p1 <- ggplot(means_data_n,
          axis.text.x = element_text(size = 8))
 ggplotly(p1)
 ```
+
+<!--# This interactive figure is really outstanding. This is one of the most beautiful things I have ever seen. I am so jealous. You have to show me how you do that. -->
+
+<!--# Very cool Quarto document! I managed to run everything perfectly. Btw, can you present your results from your Master thesis when you have time some day? -->
