@@ -1,0 +1,30 @@
+---
+title: "Effect of winter icing and summer warming on leaf nutrient content of three dominant plant species in high-Arctic Svalbard"
+format: html
+editor: visual
+bibliography: references.bib
+csl: nordic-journal-of-botany.csl
+execute:
+  echo: false
+---
+
+```{r}
+#| label: setup
+#| message: false
+
+library(tidyverse) # for ggplot2, dplyr, readr etc
+library(here)      # for help finding files
+library(gt)        # for tables
+library(utils)     # To read tables
+```
+
+# Data loading
+
+```{r}
+#| label: load-data
+#| message: false
+
+df<-read.table(here("data/nutrients_plant_icing_adventdalen_2025.txt", header = TRUE, sep = " "))
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
